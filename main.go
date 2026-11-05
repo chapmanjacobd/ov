@@ -11,7 +11,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/noborus/ov/oviewer"
+	"github.com/chapmanjacobd/ov/oviewer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"

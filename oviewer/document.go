@@ -17,8 +17,8 @@ import (
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/jwalton/gchalk"
 	"github.com/noborus/guesswidth"
-	"github.com/noborus/ov/biomap"
-	"github.com/noborus/ov/indexmap"
+	"github.com/chapmanjacobd/ov/biomap"
+	"github.com/chapmanjacobd/ov/indexmap"
 )
 
 // document type.

@@ -5,7 +5,7 @@ package main
 import (
 	"os/exec"
 
-	"github.com/noborus/ov/oviewer"
+	"github.com/chapmanjacobd/ov/oviewer"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/noborus/ov/oviewer"
+	"github.com/chapmanjacobd/ov/oviewer"
 	"github.com/spf13/viper"
 )
 

@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/noborus/ov/oviewer"
+	"github.com/chapmanjacobd/ov/oviewer"
 )
 
 const (

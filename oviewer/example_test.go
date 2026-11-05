@@ -9,7 +9,7 @@ import (
 
 	"github.com/gdamore/tcell/v3"
 	"github.com/gdamore/tcell/v3/vt"
-	"github.com/noborus/ov/oviewer"
+	"github.com/chapmanjacobd/ov/oviewer"
 )
 
 const cwd = ".."

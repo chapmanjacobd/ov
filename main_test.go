@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/noborus/ov/oviewer"
+	"github.com/chapmanjacobd/ov/oviewer"
 	"golang.org/x/term"
 )
 

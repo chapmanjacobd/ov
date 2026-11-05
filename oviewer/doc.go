@@ -12,7 +12,7 @@ https://github.com/noborus/mdviewer/
 	package main
 
 	import (
-	    "github.com/noborus/ov/oviewer"
+	    "github.com/chapmanjacobd/ov/oviewer"
 	)
 
 	func main() {

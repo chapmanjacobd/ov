@@ -3,7 +3,7 @@ package oviewer
 import (
 	"io"
 
-	"github.com/noborus/ov/biomap"
+	"github.com/chapmanjacobd/ov/biomap"
 )
 
 // renderDoc returns a new document with the reader.

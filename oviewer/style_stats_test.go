@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gdamore/tcell/v3"
-	"github.com/noborus/ov/indexmap"
+	"github.com/chapmanjacobd/ov/indexmap"
 )
 
 func newStyleTestRoot(states []bool) *Root {
