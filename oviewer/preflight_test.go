@@ -60,6 +60,25 @@ func TestRoot_quitSmallPreflightFilterDoesNotFit(t *testing.T) {
 	}
 }
 
+func TestRoot_quitSmallPreflightMultipleDocuments(t *testing.T) {
+	tcellNewScreen = fakeScreen
+	defer func() {
+		tcellNewScreen = tcell.NewScreen
+	}()
+
+	fileName := filepath.Join(testdata, "test.txt")
+	root := rootFileReadHelper(t, fileName, fileName)
+	root.Config.QuitSmall = true
+	if err := root.prepareRun(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	root.prepareScreen()
+
+	if root.quitSmallPreflight(context.Background()) {
+		t.Fatal("quitSmallPreflight() = true with multiple documents, want false")
+	}
+}
+
 func TestRoot_quitSmallPreflightWaitsForEOF(t *testing.T) {
 	tcellNewScreen = fakeScreen
 	defer func() {

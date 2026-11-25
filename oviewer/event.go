@@ -160,6 +160,9 @@ func (root *Root) quitSmallPreflight(ctx context.Context) bool {
 	if !root.Config.QuitSmall && !root.Config.QuitSmallFilter {
 		return false
 	}
+	if root.DocumentLen() != 1 {
+		return false
+	}
 	deadline := time.Now().Add(QuitSmallCountDown * UpdateInterval)
 	wait := func() bool {
 		select {
