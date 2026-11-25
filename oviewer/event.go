@@ -152,6 +152,100 @@ func (root *Root) quitCheck() bool {
 	return false
 }
 
+// quitSmallPreflight waits briefly for a document or filter result that is
+// still loading. Deciding before switchToRealScreen() avoids painting the
+// alternate screen only to clear it and print the same content, which is
+// visible as a full-screen refresh on slow terminals.
+func (root *Root) quitSmallPreflight(ctx context.Context) bool {
+	if !root.Config.QuitSmall && !root.Config.QuitSmallFilter {
+		return false
+	}
+	deadline := time.Now().Add(QuitSmallCountDown * UpdateInterval)
+	wait := func() bool {
+		select {
+		case <-ctx.Done():
+			return false
+		case <-time.After(UpdateInterval / 5):
+			return true
+		}
+	}
+
+	if root.Config.QuitSmallFilter {
+		// The filter document is created by a queued event. Process the
+		// queue on the virtual screen so the filter starts before deciding.
+		for {
+			if root.processEventQueue(ctx) {
+				return true
+			}
+			if root.Doc.documentType == DocFilter {
+				break
+			}
+			if !time.Now().Before(deadline) || !wait() {
+				return false
+			}
+		}
+		if root.DocumentLen() != 2 {
+			return false
+		}
+		for {
+			if root.quitCheckFilter() {
+				return true
+			}
+			if root.Doc.BufEOF() || root.Doc.BufEndNum() > root.scr.vHeight {
+				return false
+			}
+			if !time.Now().Before(deadline) || !wait() {
+				return false
+			}
+		}
+	}
+
+	for {
+		if root.quitCheck() {
+			return true
+		}
+		if root.Doc.BufEOF() || root.Doc.BufEndNum() > root.scr.vHeight {
+			return false
+		}
+		if !time.Now().Before(deadline) || !wait() {
+			return false
+		}
+	}
+}
+
+// quitCheckFilter checks if the filter result fits on one screen.
+func (root *Root) quitCheckFilter() bool {
+	if root.DocumentLen() != 2 || root.Doc.documentType != DocFilter {
+		return false
+	}
+	if !root.Doc.BufEOF() {
+		return false
+	}
+	if !root.docSmall() {
+		return false
+	}
+	root.Config.IsWriteOnExit = true
+	return true
+}
+
+// processEventQueue processes events posted before the screen is ready.
+// It returns true if an event requests to quit.
+func (root *Root) processEventQueue(ctx context.Context) bool {
+	for {
+		root.eventMu.Lock()
+		if len(root.eventQueue) == 0 {
+			root.eventMu.Unlock()
+			return false
+		}
+		ev := root.eventQueue[0]
+		root.eventQueue = root.eventQueue[1:]
+		root.eventMu.Unlock()
+		if root.event(ctx, ev) {
+			return true
+		}
+	}
+}
+
 // notifyEOFReached notifies that EOF has been reached.
 func (root *Root) notifyEOFReached(m *Document) {
 	if root.Config.NotifyEOF == 0 {

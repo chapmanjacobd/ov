@@ -656,6 +656,9 @@ func (root *Root) Run() error {
 	if root.quitCheck() {
 		return nil
 	}
+	if root.quitSmallPreflight(ctx) {
+		return nil
+	}
 	if err := root.switchToRealScreen(); err != nil {
 		return err
 	}
