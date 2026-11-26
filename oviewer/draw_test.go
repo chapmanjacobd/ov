@@ -997,3 +997,12 @@ func TestNeedsDisplaySyncPerformance(t *testing.T) {
 		}
 	}
 }
+
+func TestRoot_putDoesNotWriteLineBreaks(t *testing.T) {
+	root := rootHelper(t)
+	root.Screen.Put(0, 0, "x", tcell.StyleDefault)
+	root.put(0, 0, "\n", tcell.StyleDefault)
+	if got := getContents(t, root, 0, 1); got != "x" {
+		t.Fatalf("screen content = %q, want %q", got, "x")
+	}
+}

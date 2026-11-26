@@ -632,6 +632,11 @@ func (root *Root) putContents(x int, y int, contents contents, ovs OVStyle) {
 
 // put calls Screen.Put and checks if display sync is needed.
 func (root *Root) put(x, y int, str string, style tcell.Style) {
+	// A line break is kept in the parsed contents for alignment, but writing
+	// it to the screen would move the terminal cursor.
+	if str == "\n" {
+		return
+	}
 	root.Screen.Put(x, y, str, style)
 	if !root.scr.forceDisplaySync && needsDisplaySync(str) {
 		root.scr.forceDisplaySync = true

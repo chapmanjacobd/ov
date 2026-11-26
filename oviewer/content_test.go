@@ -95,7 +95,8 @@ func Test_StrToContentsNormal(t *testing.T) {
 			args: args{line: "a\fa", tabWidth: 4},
 			want: contents{
 				{width: 1, style: tcell.StyleDefault, str: "a"},
-				{width: 0, style: tcell.StyleDefault, str: "\f"},
+				{width: 1, style: tcell.StyleDefault, str: "^"},
+				{width: 1, style: tcell.StyleDefault, str: "L"},
 				{width: 1, style: tcell.StyleDefault, str: "a"},
 			},
 		},
@@ -104,7 +105,8 @@ func Test_StrToContentsNormal(t *testing.T) {
 			args: args{line: "a\u007fa", tabWidth: 4},
 			want: contents{
 				{width: 1, style: tcell.StyleDefault, str: "a"},
-				{width: 0, style: tcell.StyleDefault, str: "\u007f"},
+				{width: 1, style: tcell.StyleDefault, str: "^"},
+				{width: 1, style: tcell.StyleDefault, str: "?"},
 				{width: 1, style: tcell.StyleDefault, str: "a"},
 			},
 		},
@@ -220,7 +222,8 @@ func Test_StrToContentsOverlapping(t *testing.T) {
 			name: "testOverstrike4",
 			args: args{line: "\a", tabWidth: 8},
 			want: contents{
-				{width: 0, style: tcell.StyleDefault, str: "\a"},
+				{width: 1, style: tcell.StyleDefault, str: "^"},
+				{width: 1, style: tcell.StyleDefault, str: "G"},
 			},
 		},
 		{
@@ -342,9 +345,10 @@ func Test_parseState_zeroWidthHandle(t *testing.T) {
 			r: '\f',
 			wantLC: contents{
 				{width: 1, style: tcell.StyleDefault, str: "a"},
-				{width: 0, style: tcell.StyleDefault, str: "\f"},
+				{width: 1, style: tcell.StyleDefault, str: "^"},
+				{width: 1, style: tcell.StyleDefault, str: "L"},
 			},
-			wantTabX:      1,
+			wantTabX:      3,
 			wantBsFlag:    false,
 			wantBsContent: DefaultContent,
 		},
@@ -359,9 +363,10 @@ func Test_parseState_zeroWidthHandle(t *testing.T) {
 			r: 0x7f,
 			wantLC: contents{
 				{width: 1, style: tcell.StyleDefault, str: "a"},
-				{width: 0, style: tcell.StyleDefault, str: "\x7f"},
+				{width: 1, style: tcell.StyleDefault, str: "^"},
+				{width: 1, style: tcell.StyleDefault, str: "?"},
 			},
-			wantTabX:      1,
+			wantTabX:      3,
 			wantBsFlag:    false,
 			wantBsContent: DefaultContent,
 		},

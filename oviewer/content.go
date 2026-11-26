@@ -3,6 +3,7 @@ package oviewer
 import (
 	"slices"
 	"strings"
+	"unicode"
 
 	"github.com/gdamore/tcell/v3"
 	"github.com/gdamore/tcell/v3/color"
@@ -178,10 +179,12 @@ func (st *parseState) zeroWidthHandle(r rune) {
 		return
 	case r == '\r': // CR
 		return
-	case r < 0x20: // control character
-		st.controlCharHandle(r)
+	case r == '\n': // LF terminates a line and is not displayed
+		c := DefaultContent
+		c.str = "\n"
+		st.lc = append(st.lc, c)
 		return
-	case r == 0x7f: // DEL
+	case unicode.IsControl(r): // C0, DEL, and C1 control characters
 		st.controlCharHandle(r)
 		return
 	}
@@ -240,11 +243,30 @@ func (st *parseState) backspaceHandle() {
 }
 
 // controlCharHandle handles control characters.
+// They are shown in caret notation so a document cannot send them to the
+// terminal and change its state.
 func (st *parseState) controlCharHandle(r rune) {
-	c := DefaultContent
-	c.str = string(r)
-	c.width = 0
-	st.lc = append(st.lc, c)
+	notation := controlCharNotation(r)
+	for _, char := range notation {
+		c := DefaultContent
+		c.str = string(char)
+		c.width = 1
+		c.style = st.style
+		st.lc = append(st.lc, c)
+	}
+	st.tabx += uniseg.StringWidth(notation)
+}
+
+// controlCharNotation returns a printable representation of a control rune.
+func controlCharNotation(r rune) string {
+	switch {
+	case r < 0x20:
+		return "^" + string(r+0x40)
+	case r == 0x7f:
+		return "^?"
+	default:
+		return "?"
+	}
 }
 
 // last returns the last character of Contents.
