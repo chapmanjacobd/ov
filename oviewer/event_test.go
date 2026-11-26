@@ -201,3 +201,21 @@ drained:
 		t.Fatalf("screenState = %d, want %d", gotState, ScreenStateReady)
 	}
 }
+
+func TestRoot_eventLoopStopsWhenContextIsCancelled(t *testing.T) {
+	root := rootHelper(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		root.eventLoop(ctx, make(chan struct{}))
+	}()
+
+	cancel()
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("eventLoop did not stop after context cancellation")
+	}
+}

@@ -23,10 +23,14 @@ func (root *Root) eventLoop(ctx context.Context, quitChan chan<- struct{}) {
 	root.generateSectionList()
 	for {
 		root.everyUpdate(ctx)
-		ev := <-root.Screen.EventQ()
-		if quit := root.event(ctx, ev); quit {
-			close(quitChan)
+		select {
+		case <-ctx.Done():
 			return
+		case ev := <-root.Screen.EventQ():
+			if quit := root.event(ctx, ev); quit {
+				close(quitChan)
+				return
+			}
 		}
 	}
 }

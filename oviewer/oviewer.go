@@ -689,21 +689,28 @@ func (root *Root) Run() error {
 	quitChan := make(chan struct{})
 
 	root.monitorEOF()
+	loopDone := make(chan struct{})
 	go func() {
+		defer close(loopDone)
 		// Undo screen when goroutine panic.
-		defer func() {
-			root.Close()
-		}()
+		defer root.Close()
 		root.eventLoop(ctx, quitChan)
 	}()
 
 	for {
 		select {
 		case <-quitChan:
+			<-loopDone
+			return nil
+		case <-loopDone:
 			return nil
 		case <-sigSuspend:
 			root.Suspend()
 		case sig := <-sigs:
+			// Stop the event loop before finalizing the screen so Fini
+			// cannot race with drawing or input handling.
+			cancel()
+			<-loopDone
 			return fmt.Errorf("%w [%s]", ErrSignalCatch, sig)
 		}
 	}
@@ -809,7 +816,9 @@ func (root *Root) prepareAllDocuments() {
 
 // Close closes the oviewer.
 func (root *Root) Close() {
-	root.screenState.Store(ScreenStateTerminated)
+	if root.screenState.Swap(ScreenStateTerminated) == ScreenStateTerminated {
+		return
+	}
 	root.Screen.Fini()
 }
 
