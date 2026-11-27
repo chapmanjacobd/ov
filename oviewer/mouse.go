@@ -8,7 +8,6 @@ import (
 	"unicode"
 
 	"github.com/gdamore/tcell/v3"
-	"golang.design/x/clipboard"
 )
 
 // ClickType represents the type of mouse click.
@@ -557,8 +556,7 @@ func (root *Root) copyClipboard(ctx context.Context, str string) {
 	case "OSC52":
 		root.Screen.SetClipboard([]byte(str))
 	default: // "system" (use system clipboard)
-		_, err := clipboard.Write(ctx, clipboard.FmtText, []byte(str))
-		if err != nil {
+		if err := writeClipboard(ctx, str); err != nil {
 			root.debugMessage("copyClipboard: " + err.Error())
 		}
 	}
@@ -586,7 +584,7 @@ func (root *Root) pasteFromClipboard(ctx context.Context) {
 		return
 	}
 
-	buf, err := clipboard.Read(ctx, clipboard.FmtText)
+	buf, err := readClipboard(ctx)
 	if err != nil {
 		root.debugMessage("pasteFromClipboard: " + err.Error())
 		return

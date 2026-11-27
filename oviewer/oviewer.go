@@ -22,7 +22,6 @@ import (
 	"github.com/gdamore/tcell/v3/vt"
 	"github.com/noborus/tcellansi"
 	"github.com/spf13/viper"
-	"golang.design/x/clipboard"
 	"golang.org/x/term"
 )
 
@@ -679,7 +678,7 @@ func (root *Root) Run() error {
 	}
 
 	// Initialize the clipboard. This is necessary for read/write to the clipboard.
-	if err := clipboard.Init(); err != nil {
+	if err := initClipboard(); err != nil {
 		log.Printf("failed to initialize clipboard: %v\n", err)
 	}
 
